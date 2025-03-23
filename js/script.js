@@ -5,19 +5,29 @@ const fillColor = document.querySelector("#fill-color");
 const sizeSlider = document.querySelector("#size-slider");
 const colorBtns = document.querySelectorAll(".colors .option");
 const colorPicker = document.querySelector("#color-picker");
+const clearCanvasBtn = document.querySelector(".clear-canvas");
+const saveImageBtn = document.querySelector(".save-image");
 
 let ctx = canvas.getContext("2d"),
   isDrawing = false,
-  brushWidth = 3,
+  brushWidth = 5,
   selectedTool = "brush",
   prevMouseX,
   prevMouseY,
   selectedColor = "#000";
 
+//Set canvas background
+const setCanvasBack = () => {
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = selectedColor;
+};
+
 //Setting height and width
 window.addEventListener("load", () => {
   canvas.width = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
+  setCanvasBack();
 });
 
 //Start Drawing
@@ -76,6 +86,10 @@ const drawing = (e) => {
     case "triangle":
       drawTriangle(e);
       break;
+    case "eraser":
+      ctx.strokeStyle = "#fff";
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
     default:
       break;
   }
@@ -86,7 +100,6 @@ toolBtns.forEach((btn) => {
     document.querySelector(".options .active").classList.remove("active");
     btn.classList.add("active");
     selectedTool = btn.id;
-    console.log(`Selected tool: ${selectedTool}`);
   });
 });
 
@@ -107,6 +120,19 @@ sizeSlider.addEventListener("change", () => (brushWidth = sizeSlider.value));
 colorPicker.addEventListener("change", () => {
   colorPicker.parentElement.style.background = colorPicker.value;
   colorPicker.parentElement.click();
+});
+
+//Clear canvas button
+clearCanvasBtn.addEventListener("click", () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+//Save image
+saveImageBtn.addEventListener("click", () => {
+  const link = document.createElement("a");
+  link.download = `Berd-paint${Date.now()}.jpg`;
+  link.href = canvas.toDataURL();
+  link.click();
 });
 
 //Stop Drawing
